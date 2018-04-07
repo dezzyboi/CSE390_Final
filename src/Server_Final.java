@@ -1,59 +1,29 @@
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
 
-/**
- * 
- * @author desmondwong
- *
- */
-public class Server390 {
-
-	private ServerSocket server; 
+public class Server_Final {
+	private ServerSocket server;
 	private int serverport;
-	private Socket connection; //Client socket
-	private ObjectOutputStream output; //Data to be sent by Server
-	private ObjectInputStream input; //Data received by Server
+	private Socket connection;
+	private ObjectOutputStream output;
+	private ObjectInputStream input;	
 	
 	/**
-	 * Private Class that invokes each Socket as a Thread
-	 * @param port is the Socket's port number
+	 * Constructor
+	 * @param port
 	 */
-	private static class SocketThreads implements Runnable{
-		private int serversocketport;
-		
-		/**
-		 * Constructor that stores port number of each socket
-		 * @param d port number
-		 */
-		public SocketThreads (double d) {
-			serversocketport = (int) d; 
-		}
-		
-		/**
-		 * starts the Server390 application
-		 */
-		public void run() {
-			Server390 application = new Server390(serversocketport); //Instance of Server390 class
-			application.runServer();//starts Server
-		}	
+	public Server_Final (int port) {
+		serverport = port;
 	}
 	
-	/**
-	 * Constructor that stores port number of each socket in serverport
-	 * @param port Socket's port number
-	 */
-	public Server390 (int port){
-		serverport = port; //port from constructor put into global variable
-	}
 	
 	/**
-	 * executes all the methods
+	 * run method
 	 */
-	public void runServer(){
+	public void runServer_Final() {
 		try{
 			server = new ServerSocket (serverport); //initiates server socket
 			while (true){//keeps sockets listening even after connection terminated
@@ -71,7 +41,6 @@ public class Server390 {
 		}catch (IOException ioException){
 			ioException.printStackTrace();//show errors
 		}
-		
 	}
 	
 	/**
@@ -140,24 +109,6 @@ public class Server390 {
 			System.out.println("<SERVER><P" + serverport+ ">"  + message); //shows on Server side what server sent to Client
 		}catch(IOException ioException){//handles error if found
 			System.out.println("\nError writing object");
-		}
-	}
-	
-	/**
-	 * Main initiates all three threads and joins them together
-	 * @param args
-	 * @throws InterruptedException 
-	 */
-	public static void main(String[] args) throws InterruptedException {
-		Thread[] thread = new Thread[3];//creates new Thread array
-		int[] ports = new int[]{4,6,8};//port numbers for each thread invoked
-		for (int i = 0; i< thread.length; i++){
-			thread[i] = new Thread (new SocketThreads(ports[i]));//creates a new thread with port numbers
-			thread[i].start();
-			System.out.println("Creating server socket on port " + ports[i]);	
-		}
-		for (int i = 0; i< thread.length-1; i++){
-			thread[i].join();//joins threads
 		}
 	}
 }
