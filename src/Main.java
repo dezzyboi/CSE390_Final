@@ -1,3 +1,6 @@
+import network.ShootingClient_Final;
+import network.SocketThreads;
+
 public class Main {
 	
 	public static Runnable MainThread (Thread [] array, int size) {

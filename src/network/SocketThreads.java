@@ -1,3 +1,4 @@
+package network;
 
 public class SocketThreads implements Runnable{
 	private int serversocketport;
