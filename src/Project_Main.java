@@ -1,7 +1,7 @@
 import network.ShootingClient_Final;
 import network.SocketThreads;
 
-public class Main {
+public class Project_Main {
 	
 	public static Runnable MainThread (Thread [] array, int size) {
 		int[] ports = new int[]{4,6};//port numbers for each thread invoked
