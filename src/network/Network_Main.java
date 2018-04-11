@@ -13,7 +13,7 @@ public class Network_Main {
 		
 		for (int i = 2; i < 5; i++) {
 			array[i]= new Thread (new ShootingClient_Final(ports[i-2]));//need to find new ports
-			System.out.println("Creating server socket on port " + ports[i]);	
+			System.out.println("Creating client socket on port " + ports[i]);	
 		}
 		return null;
 	}
