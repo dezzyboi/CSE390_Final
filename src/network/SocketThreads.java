@@ -1,10 +1,17 @@
 package network;
-
+/**
+ * 
+ * @author desmondwong
+ *
+ */
 public class SocketThreads implements Runnable{
 	private int serversocketport;
-	
-	public SocketThreads (double d) {
-		serversocketport = (int) d;
+	/**
+	 * 
+	 * @param d
+	 */
+	public SocketThreads (int d) {
+		serversocketport = d;
 	}
 	
 	public void run() {

@@ -1,30 +1,63 @@
 package network;
 import network.ShootingClient_Final;
 import network.SocketThreads;
-
+/**
+ * 
+ * @author desmondwong
+ *
+ */
 public class Network_Main {
-	public static Runnable MainThread (Thread [] array, int size) {
-		int[] ports = new int[]{4,6};//port numbers for each thread invoked
-		for (int i = 0; i< 2; i++){
-			array[i] = new Thread (new SocketThreads(ports[i]));//creates a new thread with port numbers
-			array[i].start();
-			System.out.println("Creating server socket on port " + ports[i]);	
-		}
-		
-		for (int i = 2; i < 5; i++) {
-			array[i]= new Thread (new ShootingClient_Final(ports[i-2]));//need to find new ports
-			System.out.println("Creating client socket on port " + ports[i]);	
-		}
-		return null;
-	}
+	public static Thread [] thread = new Thread [5];
+	final static String [] IP = new String [2];
+	final static int port [] = new int [2];
 	
+	/**
+	 * 
+	 * @param ip1
+	 * @param ip2
+	 * @param ip1Port
+	 * @param ip2Port
+	 */
+	public Network_Main(String ip1, String ip2, int ip1Port, int ip2Port) {
+		IP[0] = ip1;
+		IP[1] = ip2;
+		port[0] = ip1Port;
+		port[1] = ip2Port;
+	}
+	/**
+	 * 
+	 * @author desmondwong
+	 *
+	 */
+	private static class Main_Thread implements Runnable{
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			for (int i = 1; i < thread.length; i++) {
+				if (i == 1 || i == 2) {//thread 2 & 3
+					thread[i] = new Thread (new SocketThreads(port[i]));
+					thread[i].start();
+					System.out.println("Thread " + i + " created");
+				}else{//thread 4 & 5
+					thread[3] = new Thread (new ShootingClient_Final (IP[i]));
+					thread[i].start();
+					System.out.println("Thread 3 created");
+				}
+			}
+		}
+	}
+	/**
+	 * 
+	 * @param args
+	 * @throws InterruptedException
+	 */
 	public static void main(String[] args) throws InterruptedException {
-		Thread[] thread = new Thread[5];//creates new Thread array
-		thread[0] = new Thread (MainThread(thread, 5));
+		thread [0] = new Thread (new Main_Thread());
+		thread[0].start();
 		System.out.println("Main Thread created");
 		for (int i = 0; i< thread.length-1; i++){
 			thread[i].join();//joins threads
 		}
 	}
-	
 }
+

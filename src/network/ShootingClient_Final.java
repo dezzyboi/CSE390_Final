@@ -6,26 +6,26 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
-
+/**
+ * 
+ * @author desmondwong
+ *
+ */
 public class ShootingClient_Final implements Runnable{
 	private static ObjectOutputStream output; //Data to be sent by Client
 	private static ObjectInputStream input; //Data received by Client
 	private String message; //global variable for string data
 	private static String Server = "Lab5213-14.ece.rmc.ca"; // server 1 name
 	private static Socket clientSocket; //client socket
-	private int portnum; //port number
+	private int portnum[] = new int[] {4,6};
 	
 	/**
 	 * Constructor that takes the port number of user input
 	 * @param port
 	 * @param host
 	 */
-	public ShootingClient_Final(int port){
-		portnum = port;
-		if (portnum == -1){ //checks if valued entered is an exit command
-			closeConnection(); //terminates connection if true
-		}
-
+	public ShootingClient_Final(String IP){
+		Server = IP;
 	}
 	
 	/**
@@ -52,9 +52,19 @@ public class ShootingClient_Final implements Runnable{
 	 * @throws IOException
 	 */
 	private void connectToServer() throws IOException{
-		System.out.println(("Attempting to connect to: " + Server + " at port " + portnum));
-		clientSocket = new Socket (InetAddress.getByName(Server), portnum);//new socket created based on server name and port number
-		System.out.println("Connected to: " + clientSocket.getInetAddress().getHostName());
+		boolean check = false;
+		for (int i = 0; i < portnum.length; i++) {
+			do {
+				try {
+					System.out.println(("Attempting to connect to: " + Server + " at port " + portnum[i]));
+					clientSocket = new Socket (InetAddress.getByName(Server), portnum[i]);//new socket created based on server name and port number
+					System.out.println("Connected to: " + clientSocket.getInetAddress().getHostName());
+					check = true;
+				}catch(IllegalArgumentException e){
+					check = false;
+				}
+			}while(check == false);
+		}
 	}
 	
 	/**
@@ -78,13 +88,6 @@ public class ShootingClient_Final implements Runnable{
 			try{
 				message = (String) input.readObject();//the last string received by server
 				System.out.println("<SERVER><P" + portnum + "> " + message);
-				if (portnum == 4){
-					System.out.println("\n<SERVER><P" + portnum + "> This port will echo user input. Please type something or an exit command to quit.");
-				}else if (portnum == 6){
-					System.out.println("\n<SERVER><P" + portnum + "> This port will read and check files. Please type a command followed by its path or an exit command to quit.");
-				}else{
-					System.out.println("\n<SERVER><P" + portnum + "> This port will do math. Please type a command followed by the number or an exit command to quit.");
-				}
 				String outgoing = scan.nextLine();//scans user input and puts it into outgoing string variable
 				sendData(outgoing);//sends outgoing string variable to Server
 

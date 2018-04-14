@@ -4,7 +4,11 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
-
+/**
+ * 
+ * @author desmondwong
+ *
+ */
 public class Server_Final {
 	private ServerSocket server;
 	private int serverport;
@@ -19,7 +23,6 @@ public class Server_Final {
 	public Server_Final (int port) {
 		serverport = port;
 	}
-	
 	
 	/**
 	 * run method
