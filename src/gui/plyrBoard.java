@@ -16,7 +16,7 @@ public class plyrBoard extends JFrame {
 	private static Color water = Color.CYAN;
 	private static Color ship = Color.DARK_GRAY;
 
-	private static JPanel[][] board = new JPanel[10][13];
+	static JPanel[][] board = new JPanel[10][13];
 
 	//Array to store x and y coordinates of a shot
 	static int shot[] = new int[2];
@@ -29,6 +29,7 @@ public class plyrBoard extends JFrame {
 		contents.setLayout(new GridLayout(10,13));
 		board[0][0] = new JPanel();
 		contents.add(board[0][0]);
+		
 
 		for (int i = 1; i < 13; i++) {
 			JLabel label = new JLabel(Character.toString((char) (i+64)));
@@ -55,13 +56,27 @@ public class plyrBoard extends JFrame {
 		}
 	}
 
-	public static void shotSent(boolean good, int[] shot) {
-		if (good) {
-			board[shot[0]][shot[1]].setBackground(hit);
-		} else {
-			board[shot[0]][shot[1]].setBackground(missed);
+	public boolean shotResults(int[] result) {
+		boolean dead = false;
+		
+		if(result[3] == -10) {
+			for (int i = 0; i < 10; i++) {
+				for (int k = 0; i < 13; k++) {
+					k++;
+					board[i][k].setBackground(Color.BLACK);
+				}
+			}
+			dead = true;
 		}
+		if(result[2] == -10) {
+			plyrBoard.board[result[0]][result[1]].setBackground(missed);
+		} else {
+			plyrBoard.board[result[0]][result[1]].setBackground(hit);
+		}
+		return dead;
 	}
+	
 }
+
 
 

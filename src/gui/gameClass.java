@@ -8,7 +8,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import textfiles.writerClass;
+
+import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class gameClass extends JFrame {
 	private static long startTime = System.nanoTime()/1000000000;
@@ -18,6 +21,9 @@ public class gameClass extends JFrame {
 	private static Color hit = Color.RED;
 	private static Color water = Color.CYAN;
 	private static Color ship = Color.DARK_GRAY;
+	boolean fleetSunk = true;
+	boolean sunk = true;
+	boolean dmg = true;
 	
 	private static JPanel[][] board = new JPanel[10][13];
 
@@ -26,6 +32,8 @@ public class gameClass extends JFrame {
 	private static int[][] ships = new int[5][10];
 	private static int[] ssize = new int [5];
 	private static String[] shipClass = new String[5];
+	private char[][] verifyShot = new char[10][13];
+	private long[] delay = new long[2];
 
 
 	//Array to store x and y coordinates of a shot
@@ -47,6 +55,12 @@ public class gameClass extends JFrame {
 		shipClass[1] = "Aircraft Carrier";
 		shipClass[0] = "Battleship";
 		
+		for (int j = 1; j < 10; j++ ) {
+			for (int k = 1; k < 13; k++) {
+				verifyShot[j][k] = 'N'; 
+			}
+		}
+		
 		for (int i = 1; i < 13; i++) {
 			JLabel label = new JLabel(Character.toString((char) (i+64)));
 			board[0][i] = new JPanel();
@@ -65,7 +79,6 @@ public class gameClass extends JFrame {
 				k++;
 				board[i][k] = new JPanel();
 				board[i][k].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-				//board[i][k] = '~';
 				board[i][k].setBackground(water);
 				contents.add(board[i][k]);
 			}
@@ -383,7 +396,32 @@ public class gameClass extends JFrame {
 		}
 		System.out.println();
 	}
-
+	
+	public int[] takeShot(boolean dead) throws IOException, InterruptedException {
+		boolean fired = false;
+		int[] target = new int[2];
+		target[0] = -1;
+		target[1] = -1;
+		if (!dead) {
+			while (!fired) {
+				Random random = new Random();
+				target[0] = random.nextInt(9) + 1;
+				target[1] = random.nextInt(12) + 1;
+				if (verifyShot[target[0]][target[1]] == 'N') {
+					verifyShot[target[0]][target[1]] = 'Y';
+					fired = true;
+				}
+			}
+		}
+		Random random = new Random();
+		int i = random.nextInt(2);
+		delay[0] = (long) 0.1;
+		delay[1] = (long) 0.5;
+		TimeUnit.SECONDS.sleep(delay[i]);
+		final long shotAway = System.nanoTime()/1000000000 - startTime;
+		battlelog.writeToFile("Giving them hell at coordinates " + target[0] + "," + target[1] + " at t + "+ shotAway + " secs" + ", sir!");
+		return target;
+	}
 }
 
 
