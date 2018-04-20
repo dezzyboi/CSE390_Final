@@ -1,6 +1,7 @@
 package network;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
@@ -9,27 +10,28 @@ import java.io.IOException;
  * @author desmondwong
  *
  */
-public class Server_Final {
+public class Server_Final implements Runnable{
 	private ServerSocket server;
 	private int serverport;
 	private Socket connection;
 	private ObjectOutputStream output;
 	private ObjectInputStream input;	
+	private int port;
 	
 	/**
 	 * Constructor
 	 * @param port
 	 */
-	public Server_Final (int port) {
-		serverport = port;
+	public Server_Final (int portnum) {
+		port = portnum;
 	}
 	
 	/**
 	 * run method
 	 */
-	public void runServer_Final() {
+	public void runServer() {
 		try{
-			server = new ServerSocket (serverport); //initiates server socket
+			server = new ServerSocket (port); //initiates server socket
 			while (true){//keeps sockets listening even after connection terminated
 				try{
 					waitForConnection(); //waits for connection
@@ -52,7 +54,7 @@ public class Server_Final {
 	 * @throws IOException
 	 */
 	private void waitForConnection() throws IOException{ 
-		System.out.println("Waiting for connection on " + serverport);
+		System.out.println("Waiting for connection on port " + server.getLocalPort());
 		connection = server.accept();//socket begins accepting connections
 		System.out.println("Connection received from: " + connection.getInetAddress().getHostName());
 	}
@@ -74,7 +76,9 @@ public class Server_Final {
 	 */
 	private void processConnection() throws IOException{
 		String message = "Connection successful";
+		String IP = InetAddress.getLocalHost().getHostName();
 		sendData (message);	//send message to Client
+		sendData(IP);
 		do{
 			try{
 				message = (String) input.readObject(); //reads new message
@@ -115,4 +119,12 @@ public class Server_Final {
 			System.out.println("\nError writing object");
 		}
 	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		runServer();
+	}
+	
+	
 }

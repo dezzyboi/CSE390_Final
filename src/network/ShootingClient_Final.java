@@ -15,9 +15,9 @@ public class ShootingClient_Final implements Runnable{
 	private static ObjectOutputStream output; //Data to be sent by Client
 	private static ObjectInputStream input; //Data received by Client
 	private String message; //global variable for string data
-	private static String Server = "Lab5213-14.ece.rmc.ca"; // server 1 name
+	private static String Server; // server 1 name
 	private static Socket clientSocket; //client socket
-	private int portnum[] = new int[] {4,6};
+	private static int portnum[] = new int[] {6,4};
 	
 	/**
 	 * Constructor that takes the port number of user input
@@ -26,6 +26,7 @@ public class ShootingClient_Final implements Runnable{
 	 */
 	public ShootingClient_Final(String IP){
 		Server = IP;
+		runShootingClient_Final();
 	}
 	
 	/**
@@ -33,7 +34,7 @@ public class ShootingClient_Final implements Runnable{
 	 */
 	public void runShootingClient_Final() {
 		try {
-			connectToServer(); //attempts to connect to server
+			connectToServer(available(portnum[0])); //attempts to connect to server
 			getStreams(); //receives input & output streams
 			processConnection(); //processes Data
 
@@ -47,24 +48,21 @@ public class ShootingClient_Final implements Runnable{
 		}
 	}
 	
+	private static int available (int port){
+		try (Socket ignore = new Socket (Server, portnum[0])){
+			return portnum[0];
+		} catch (IOException ignore){
+			return portnum[1];
+		}
+	}
 	/**
 	 * Connects to Server
 	 * @throws IOException
 	 */
-	private void connectToServer() throws IOException{
-		boolean check = false;
-		for (int i = 0; i < portnum.length; i++) {
-			do {
-				try {
-					System.out.println(("Attempting to connect to: " + Server + " at port " + portnum[i]));
-					clientSocket = new Socket (InetAddress.getByName(Server), portnum[i]);//new socket created based on server name and port number
-					System.out.println("Connected to: " + clientSocket.getInetAddress().getHostName());
-					check = true;
-				}catch(IllegalArgumentException e){
-					check = false;
-				}
-			}while(check == false);
-		}
+	private void connectToServer(int port) throws IOException{
+		System.out.println(("Attempting to connect to: " + Server + " at port " + port));
+		clientSocket = new Socket (InetAddress.getByName(Server), port);//new socket created based on server name and port number
+		System.out.println("Connected to: " + clientSocket.getInetAddress().getHostName());
 	}
 	
 	/**
@@ -129,7 +127,6 @@ public class ShootingClient_Final implements Runnable{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
 	}
 }
 	
