@@ -6,7 +6,11 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import network.Network_Main.Main_Thread;
+
 public class readyBTN extends JPanel{
+	public static String IP1;
+	public static String IP2;
 	public readyBTN () {
 		setLayout(new FlowLayout());
 		// Declare and instantiate button
@@ -25,8 +29,10 @@ class rdyBTNLI implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		//Grabs the two dates from textfield
-		String add1 = menuClass.textB1.address.getText();
-		String add2 = menuClass.textB2.address.getText();
+		network.Network_Main.IP[0] = menuClass.textB1.address.getText();
+		network.Network_Main.IP[1] = menuClass.textB2.address.getText();
+		Main_Thread thread = new Main_Thread();
+		thread.run2();
 		
 //		//Grabs the format selected form the radio buttons
 //		String type = slect.formatBtn.getText();
