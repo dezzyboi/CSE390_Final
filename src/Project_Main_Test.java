@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 import network.Network_Main;
 
 public class Project_Main_Test {
@@ -7,7 +9,7 @@ public class Project_Main_Test {
 	public static int Port1;
 	public static int Port2;
 	
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		// TODO Auto-generated method stub
 		Network_Main start = new Network_Main();
 		start.main(args);

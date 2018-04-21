@@ -6,6 +6,10 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
+
+import javax.swing.JFrame;
+
+import gui.plyrBoard;
 /**
  * 
  * @author desmondwong
@@ -36,7 +40,12 @@ public class ShootingClient_Final implements Runnable{
 		try {
 			connectToServer(available(portnum[0])); //attempts to connect to server
 			getStreams(); //receives input & output streams
+			plyrBoard plyr = new plyrBoard();
+			plyr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			plyr.setSize(600, 425);
+			plyr.setVisible(true);
 			processConnection(); //processes Data
+			
 
 		}catch(EOFException eofException) {
 			System.out.println("\nClient terminating connection");//tells user that connection will terminate
@@ -73,6 +82,7 @@ public class ShootingClient_Final implements Runnable{
 		output = new ObjectOutputStream(clientSocket.getOutputStream());//overwrites output stream with new Data
 		output.flush();//sends output stream
 		input = new ObjectInputStream(clientSocket.getInputStream());//overwrites input stream with new Data
+		//METHOD TO PROCESS INPUT
 		System.out.println("\nGot I/O streams\n");
 	}
 	

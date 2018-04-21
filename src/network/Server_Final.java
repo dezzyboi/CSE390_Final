@@ -18,6 +18,12 @@ public class Server_Final implements Runnable{
 	private ObjectInputStream input;	
 	private int port;
 	
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		runServer();
+	}
+	
 	/**
 	 * Constructor
 	 * @param port
@@ -83,9 +89,8 @@ public class Server_Final implements Runnable{
 			try{
 				message = (String) input.readObject(); //reads new message
 				System.out.println("<CLIENT> " + message); //displays what client typed to user
-				//Proto390 proto = new Proto390(serverport); //instance of Proto390 class
-				//String outgoing = proto.processInput(message); //creates string to be processed by Proto390 class
-				//sendData(outgoing);//sends string
+				//METHOD TO PACKAGE DATA
+				sendData("Hello");//sends string
 			}catch(ClassNotFoundException classNotFoundException){
 				System.out.println ("<SERVER> Unknown object type received"); //exception if object type received is unknown 
 			}
@@ -120,11 +125,7 @@ public class Server_Final implements Runnable{
 		}
 	}
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		runServer();
-	}
+
 	
 	
 }

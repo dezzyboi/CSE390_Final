@@ -9,7 +9,7 @@ public class menuClass extends JFrame {
 	public static Address textB2 = new Address();
 	public static readyBTN rdyBTN = new readyBTN();
 
-	menuClass(){
+	public menuClass(){
 		setTitle("Battleship Menu");
 		setLayout(new GridLayout(3,1));
 		add(textB1);

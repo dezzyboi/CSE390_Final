@@ -34,6 +34,7 @@ class rdyBTNLI implements ActionListener {
 		Main_Thread thread = new Main_Thread();
 		thread.run2();
 		
+		
 //		//Grabs the format selected form the radio buttons
 //		String type = slect.formatBtn.getText();
 //		
