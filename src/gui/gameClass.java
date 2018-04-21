@@ -21,6 +21,7 @@ public class gameClass extends JFrame {
 	private static Color hit = Color.RED;
 	private static Color water = Color.CYAN;
 	private static Color ship = Color.DARK_GRAY;
+	boolean[] state = new boolean[6];
 	boolean fleetSunk = true;
 	boolean sunk = true;
 	boolean dmg = true;
@@ -333,8 +334,8 @@ public class gameClass extends JFrame {
 //		}
 //	}
 	
-	public boolean[] shotRec(int[] shot) throws IOException {
-		boolean[] state = new boolean[6];
+	public int[] shotRec(int[] shot) throws IOException {
+		int[] result = new int[6];
 		boolean fleetSunk = true;
 		boolean sunk = true;
 		boolean dmg = true;
@@ -344,15 +345,19 @@ public class gameClass extends JFrame {
 				if(shot[0] == ships[i][j] && shot[1] == ships[i][j+1] && !board[ships[i][j]][ships[i][j+1]].getBackground().equals(hit)) {
 					board[shot[0]][shot[1]].setBackground(hit);
 					battlelog.writeToFile("Friendly ship hit, sir! at row " + shot[0] + " column " + shot[1] + " at t + "+ registeredShot + " secs" );
+					result[0] = shot[0];
+					result[1] = shot[1];
+					result[2] = 1;
 				}
 				if(!board[shot[0]][shot[1]].getBackground().equals(hit)){
 					board[shot[0]][shot[1]].setBackground(missed);
 					dmg = dmg & false;
+					result[2] = 0;
 				}
 			}
 		}
 		if(!dmg ) {
-			battlelog.writeToFile("Enemy missed, sir! Hooray! Splash spotted at row " + shot[0] + " column " + shot[1] + " at t + "+ registeredShot + " secs" );
+			battlelog.writeToFile("The enemy missed, sir! Hooray! Splash spotted at row " + shot[0] + " column " + shot[1] + " at t + "+ registeredShot + " secs" );
 		}
 		
 		for (int i = 0; i < ships.length; i++) {
@@ -368,10 +373,12 @@ public class gameClass extends JFrame {
 			
 		}
 		state[5] = fleetSunk;
+		result[3] = 0;
 		if(state[5]) {
 			battlelog.writeToFile("We lost our entire fleet, sir! The Admiral will surely be disappointed...");
+			result[3] = 1;
 		}
-		return state;
+		return result;
 
 	}
 	

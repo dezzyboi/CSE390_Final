@@ -56,24 +56,22 @@ public class plyrBoard extends JFrame {
 		}
 	}
 
-	public boolean shotResults(int[] result) {
-		boolean dead = false;
-		
-		if(result[3] == -10) {
+	public void shotResults(int[] result) {
+		if(result[3] == 1) {
 			for (int i = 0; i < 10; i++) {
 				for (int k = 0; i < 13; k++) {
 					k++;
 					board[i][k].setBackground(Color.BLACK);
+					setTitle("Enemy Player DEAD!");
 				}
 			}
-			dead = true;
 		}
-		if(result[2] == -10) {
+		if(result[2] == 0) {
 			plyrBoard.board[result[0]][result[1]].setBackground(missed);
-		} else {
+		}if(result[2] == 1) {
 			plyrBoard.board[result[0]][result[1]].setBackground(hit);
 		}
-		return dead;
+
 	}
 	
 }
