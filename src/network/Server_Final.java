@@ -4,24 +4,46 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import javax.swing.JFrame;
+
+import gui.gameClass;
+import gui.plyrBoard;
+import gui.takeShot;
+
 import java.io.IOException;
 /**
  * 
  * @author desmondwong
  *
  */
-public class Server_Final implements Runnable{
+public class Server_Final {
 	private ServerSocket server;
 	private int serverport;
 	private Socket connection;
 	private ObjectOutputStream output;
 	private ObjectInputStream input;	
 	private int port;
+
 	
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		runServer();
+	
+	public static class ServerSocketThreads implements Runnable{
+		private int serversocketport;
+		public ServerSocketThreads(int portnum){
+			serversocketport = portnum;
+		}
+	
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			Server_Final server = new Server_Final(serversocketport);
+			try {
+				server.runServer();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**
@@ -34,8 +56,9 @@ public class Server_Final implements Runnable{
 	
 	/**
 	 * run method
+	 * @throws InterruptedException 
 	 */
-	public void runServer() {
+	public void runServer() throws InterruptedException {
 		try{
 			server = new ServerSocket (port); //initiates server socket
 			while (true){//keeps sockets listening even after connection terminated
@@ -79,23 +102,34 @@ public class Server_Final implements Runnable{
 	/**
 	 * Communicates with Client by taking input, processing it through Proto390, then sending it back to Client
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	private void processConnection() throws IOException{
-		String message = "Connection successful";
+	private void processConnection() throws IOException, InterruptedException{
+		String  message = "Connection successful";
 		String IP = InetAddress.getLocalHost().getHostName();
 		sendData (message);	//send message to Client
-		sendData(IP);
+		//sendData(IP);
+
+		plyrBoard battlegame = new plyrBoard();
+		battlegame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	battlegame.setSize(600, 425);
+		battlegame.setVisible(true);
+		int []recmessage = new int [4];
 		do{
 			try{
-				message = (String) input.readObject(); //reads new message
+
 				System.out.println("<CLIENT> " + message); //displays what client typed to user
-				//METHOD TO PACKAGE DATA
-				sendData("Hello");//sends string
+				battlegame.shotResults(recmessage);
+				recmessage = takeShot.fire();
+				sendData(recmessage);//sends string
+				recmessage = (int []) input.readObject(); //reads new message
+				battlegame.shotResults(recmessage);
+				input.close();//closes input stream
 			}catch(ClassNotFoundException classNotFoundException){
 				System.out.println ("<SERVER> Unknown object type received"); //exception if object type received is unknown 
 			}
-		}while (!message.equals("close")||!message.equals("exit")||!message.equals("bye")); //does above while client message are not exit commands
-	}
+		}while (recmessage[3] != 1); //does above while client message are not exit commands
+	} 
 
 	/**
 	 * Closes connection with Client
@@ -120,12 +154,25 @@ public class Server_Final implements Runnable{
 			output.writeObject(message); //overwrites output stream with message
 			output.flush();//sends output stream
 			System.out.println("<SERVER><P" + serverport+ ">"  + message); //shows on Server side what server sent to Client
+			output.close();//closes output stream
 		}catch(IOException ioException){//handles error if found
 			System.out.println("\nError writing object");
 		}
 	}
 
 
-	
+	/**
+	 * Sends message to client
+	 * @param message
+	 */
+	private void sendData(int[] message){
+		try{
+			output.writeObject(message); //overwrites output stream with message
+			output.flush();//sends output stream
+			System.out.println("<SERVER><P" + serverport+ ">"  + message); //shows on Server side what server sent to Client
+		}catch(IOException ioException){//handles error if found
+			System.out.println("\nError writing object");
+		}
+	}
 	
 }

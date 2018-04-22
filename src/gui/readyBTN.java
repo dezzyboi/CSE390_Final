@@ -2,6 +2,7 @@ package gui;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -32,7 +33,12 @@ class rdyBTNLI implements ActionListener {
 		network.Network_Main.IP[0] = menuClass.textB1.address.getText();
 		network.Network_Main.IP[1] = menuClass.textB2.address.getText();
 		Main_Thread thread = new Main_Thread();
-		thread.run2();
+		try {
+			thread.run2();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		
 //		//Grabs the format selected form the radio buttons

@@ -15,7 +15,7 @@ import network.ShootingClient_Final;
 public class Network_Main {
 	public static Thread [] thread = new Thread [5];
 	public static String [] IP = new String [2];
-	final static int port [] = new int [2];
+
 	
 	/**
 	 * 
@@ -25,8 +25,7 @@ public class Network_Main {
 	 * @param ip2Port
 	 */
 	public Network_Main() {
-		port[0] = 6;
-		port[1] = 4;
+
 	}
 	
 	/**
@@ -35,44 +34,39 @@ public class Network_Main {
 	 *
 	 */
 	public static class Main_Thread implements Runnable{
+		public static gameClass game;
+		
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			gameClass battlegame;
-			try {
-				menuClass menu = new menuClass();
-				menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				menu.setSize(300, 225);
-				menu.setVisible(true);
-				battlegame = new gameClass();
-				battlegame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		    	battlegame.setSize(600, 425);
-				battlegame.setVisible(true);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			menuClass menu = new menuClass();
+			menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			menu.setSize(300, 225);
+			menu.setVisible(true);
 
-			thread[1] = new Thread (new Server_Final(port[0]));
+			thread[1] = new Thread (new Server_Final.ServerSocketThreads(6));
 			thread[1].start();
-			System.out.println("Creating Server Socket on port " + port[0]);
+			System.out.println("Creating Server Socket on port " + 6);
 			System.out.println("Thread 1 created");
 			
-			thread[2] = new Thread (new Server_Final(port[1]));
-			thread[2].start();
-			System.out.println("Creating Server Socket on port " + port[1]);
-			System.out.println("Thread 2 created");
 			
+			thread[2] = new Thread (new Server_Final.ServerSocketThreads(4));
+			thread[2].start();
+			System.out.println("Creating Server Socket on port " + 4);
+			System.out.println("Thread 2 created");
 			
 		}
 		
-		public void run2(){
-			thread[3] = new Thread (new ShootingClient_Final (IP[0]));
+		public void run2() throws IOException{
+			
+			thread[3] = new Thread (new ShootingClient_Final.SocketThreads(IP[0], 4));
+			thread[4] = new Thread (new ShootingClient_Final.SocketThreads(IP[1], 6));
+			game = new gameClass();
 			thread[3].start();
 			System.out.println("Thread 3 created");
-			thread[4] = new Thread (new ShootingClient_Final (IP[1]));
 			thread[4].start();
 			System.out.println("Thread 4 created");
+			
 		}
 	}
 			/*
