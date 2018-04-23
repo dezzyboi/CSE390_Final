@@ -1,3 +1,4 @@
+package start;
 
 public class boardMain {
 	public static void main() {

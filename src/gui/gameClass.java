@@ -8,10 +8,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import textfiles.writerClass;
-
-import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
+
 /**
  * 
  * @author jonathangilbert

@@ -31,6 +31,7 @@ public class takeShot {
 		target[2] = -1;
 		target[3] = -1;
 
+
 //		System.out.println("Generating shot");
 		//While not an unused coordinate, generate a shot
 		while (!fired) {

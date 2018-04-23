@@ -7,7 +7,8 @@ import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import network.Network_Main.Main_Thread;
+import start.Project_Main;
+import start.Project_Main.Main_Thread;
 /**
  * Class to create the establish connection button
  * @author jonathangilbert
@@ -39,16 +40,14 @@ class conBTNLI implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		//Grabs the two IP addresses from the textfields and sends it to the networking threads
-		network.Network_Main.IP[0] = menuClass.textB1.address.getText();
-		network.Network_Main.IP[1] = menuClass.textB2.address.getText();
+		Project_Main.IP[0] = menuClass.textB1.address.getText();
+		Project_Main.IP[1] = menuClass.textB2.address.getText();
 		//Starts the client thread, one for each connection
 		Main_Thread thread = new Main_Thread();
 		try {
 			thread.run2();
-
-			
-			
 		} catch (IOException e1) {
+			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}

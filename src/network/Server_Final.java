@@ -4,9 +4,14 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.concurrent.locks.Lock;
+
 import javax.swing.JFrame;
+
 import gui.plyrBoard;
 import gui.takeShot;
+import start.Project_Main;
+
 import java.io.IOException;
 
 /**
@@ -21,8 +26,8 @@ public class Server_Final implements Runnable{
 	private ObjectInputStream input;	//Data received by Server
 	private int port;//port number
 	private static int index;//index to boolean [] connected
-
-
+	private plyrBoard battlegame;
+	private Lock lockgame;
 	
 	/**
 	 * Constructor that stores the port number and the index to array that checks if it is connected
@@ -42,7 +47,13 @@ public class Server_Final implements Runnable{
 			while (true){//keeps sockets listening even after connection terminated
 				try{
 					waitForConnection(); //waits for connection
+//					
+//					while (Project_Main.connected[0] == true ||Project_Main.connected[1] == false || Project_Main.connected[2] == true || Project_Main.connected[3] == false){
+//							System.out.println("server " +Arrays.toString(start.Project_Main.connected));
+//					}
+//					System.out.println("server "+index +Arrays.toString(Project_Main.connected));
 					getStreams(); //receives input & output streams
+					
 					processConnection(); //processes Data	
 				}
 				catch (IOException ioException){
@@ -67,7 +78,8 @@ public class Server_Final implements Runnable{
 		System.out.println("Waiting for connection on port " + server.getLocalPort());
 		connection = server.accept();//socket begins accepting connections
 		System.out.println("Connection received from: " + connection.getInetAddress().getHostName());
-		network.Network_Main.connected[index] = true;
+		start.Project_Main.connected[index] = true;
+		System.out.println("server" + index + start.Project_Main.connected[index]);
 	}
 	
 	/**
@@ -79,6 +91,7 @@ public class Server_Final implements Runnable{
 		output.flush();//sends output stream
 		input = new ObjectInputStream (connection.getInputStream());//overwrites input stream with new Data
 		System.out.println("\nGot I/O streams from Client: "  + connection.getInetAddress().getHostName());
+	
 	}
 	
 	/**
@@ -87,13 +100,14 @@ public class Server_Final implements Runnable{
 	 * @throws InterruptedException 
 	 */
 	private void processConnection() throws IOException, InterruptedException{
-
+		
 		//Displays the enemy playerboard
-		plyrBoard battlegame = new plyrBoard();
+		battlegame = new plyrBoard();
 		battlegame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	battlegame.setSize(600, 425);
 		battlegame.setVisible(true);
 		battlegame.setTitle("Host: " + connection.getInetAddress().getHostName());
+		System.out.println("displayed " + connection.getInetAddress().getHostName());
 		
 		int []recmessage = new int [4];
 		//Virtual board to track whether or not shot has been fired at location
@@ -115,9 +129,10 @@ public class Server_Final implements Runnable{
 			}catch(ClassNotFoundException classNotFoundException){
 				System.out.println ("<SERVER> Unknown object type received"); //exception if object type received is unknown 
 			}
-		}while (recmessage[3] != 1); //does above while client message are not exit commands
-		Network_Main.thread[1].interrupt();//thread 1 of this player's game is halted because player is dead
-		Network_Main.thread[2].interrupt();//thread 2 of this player's game is halted because player is dead
+		}while (Project_Main.thread[1].isAlive() && Project_Main.thread[2].isAlive()); //does above while client message are not exit commands
+
+		Project_Main.thread[3].interrupt();//thread 1 of this player's game is halted because player is dead
+		Project_Main.thread[4].interrupt();//thread 2 of this player's game is halted because player is dead
 	} 
 
 	/**
