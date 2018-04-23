@@ -99,7 +99,6 @@ public class Shooter2 implements Runnable{
 				recmessage = (int []) input.readObject();
 				recmessage = Network_Main.Main_Thread.game.shotRec(recmessage); //RENAME
 				sendData(recmessage);//sends outgoing int[] variable to Server
-				//getStreams();
 			}catch(ClassNotFoundException classNotFoundException){
 				System.out.println("\nUnknown object type received\n"); //exception if object type received is unknown 
 			}

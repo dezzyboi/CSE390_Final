@@ -45,7 +45,6 @@ public class Shooter1 implements Runnable{
 	public void run() {
 		try {
 			connectToServer(); //attempts to connect to server
-			//while (network.Network_Main.connected[0] != true || network.Network_Main.connected[1] != true){}
 			getStreams(); //receives input & output streams
 			processConnection(); //processes Data	
 		}catch(EOFException eofException) {
@@ -54,7 +53,6 @@ public class Shooter1 implements Runnable{
 			ioException.printStackTrace();//show errors
 		}finally {
 			closeConnection();//terminates connection
-
 		}
 	}
 	
@@ -100,7 +98,6 @@ public class Shooter1 implements Runnable{
 				recmessage = (int []) input.readObject();
 				recmessage = Network_Main.Main_Thread.game.shotRec(recmessage); //RENAME
 				sendData(recmessage);//sends outgoing int[] variable to Server
-				//getStreams();
 			}catch(ClassNotFoundException classNotFoundException){
 				System.out.println("\nUnknown object type received\n"); //exception if object type received is unknown 
 			}
