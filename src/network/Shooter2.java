@@ -26,6 +26,7 @@ public class Shooter2 implements Runnable{
 	private static Socket clientSocket; //client socket
 	private int port;//server port number
 	private static int index;
+	public static boolean[] serconnected;
 
 	
 	/**
@@ -37,6 +38,7 @@ public class Shooter2 implements Runnable{
 		Server = IP;
 		port = portnum;
 		index = rindex;
+		serconnected = network.Network_Main.connected;
 	}
 	
 	/**
@@ -45,8 +47,15 @@ public class Shooter2 implements Runnable{
 	public void run() {
 		try {
 			connectToServer(); //attempts to connect to server
-			getStreams(); //receives input & output streams
-			processConnection(); //processes Data	
+			if (serconnected[0] == false && serconnected[1] == false) {//1st to connect
+				while (serconnected[0] == false && serconnected[1] == false) {}
+				run2();
+			}else if (serconnected[0] == false || serconnected[1] == false) {//2nd to connect
+				while (serconnected[0] == false || serconnected[1] == false) {}
+				run2();
+			}else {//last to connect, all severs connected
+				run2();
+			}
 		}catch(EOFException eofException) {
 			System.out.println("\nClient terminating connection");//tells user that connection will terminate
 		}catch (IOException ioException) {
@@ -54,6 +63,17 @@ public class Shooter2 implements Runnable{
 		}finally {
 			closeConnection();//terminates connection
 
+		}
+	}
+	
+	public void run2() {
+		try {
+			getStreams(); //receives input & output streams
+			processConnection(); //processes Data	
+		}catch(IOException ioException){
+			ioException.printStackTrace();
+		}finally {
+			closeConnection();
 		}
 	}
 	
