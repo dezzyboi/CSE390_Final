@@ -24,7 +24,7 @@ public class gameClass extends JFrame {
     public static long startTime = System.nanoTime()/1000000000;
 	
 	//Writing constructor for the log of events during the game
-	static writerClass battlelog = new writerClass(".\\battlelog.txt", true);
+	static writerClass battlelog = new writerClass("C:\\Users\\s28122\\Desktop\\battlelog.txt", true);
 	
 	//Main object that will hold the entire grid for the own player board
 	private Container contents;
@@ -92,12 +92,6 @@ public class gameClass extends JFrame {
 		shipClass[6] = "CV";
 		shipClass[5] = "BB";
 		
-		//Loop to initiate the verification array
-		for (int j = 1; j < 10; j++ ) {
-			for (int k = 1; k < 13; k++) {
-				verifyShot[j][k] = 'N'; 
-			}
-		}
 		
 		//Create labels for columns
 		for (int i = 1; i < 13; i++) {
@@ -192,7 +186,11 @@ public class gameClass extends JFrame {
 	
 	/**
 	 * Method to place a ship on the board by updating the board colors
-	 * 
+	 * @param r        - desired row
+	 * @param c        - desired column
+	 * @param orientation
+	 * @param ships    - their current coordinates
+	 * @param currShip - current ship trying to place
 	 */
 	private static void place(int r, int c, int orientation, int ships[][], int currShip) {
 		//Int to track if row(0) or column(1)
@@ -332,7 +330,10 @@ public class gameClass extends JFrame {
 
 	/**
 	 * Method to test if a ship fits in a specified orientation on a spot
-	 * 
+	 * @param size - Size of the ship testing
+	 * @param r    - desired row
+	 * @param c    - desired column
+	 * @param orientation 
 	 */
 	private static boolean testPlace(int size, int r, int c, int orientation) {
 		
@@ -472,35 +473,43 @@ public class gameClass extends JFrame {
 
 	/**
 	 * Method to update own board with a shot received
+	 * @param shot - Array with row and column fired at
 	 * 
 	 */
 	public int[] shotRec(int[] shot) throws IOException {
 		
 		//Create a communication array, contains (Row)(Column)(Hit/Miss)(Fleet Sunk)(Player who shot)
-		int[] result = new int[5];
+		int[] result = new int[4];
 		result[0] = shot[0];
 		result[1] = shot[1];
 		//Save at what time the shot was received
 		final long registeredShot = System.nanoTime()/1000000000 - startTime;
-		
-		//Test whether it hit at every ships single grid coordinate
-		for (int i = 0; i < ships.length; i++) {
-			for (int j = 0; j < ssize[i]*2 - 1; j+=2) {
-				//Tests if the shot is on a ship target and whether that section has already been hit
-				if(shot[0] == ships[i][j] && shot[1] == ships[i][j+1] && !board[ships[i][j]][ships[i][j+1]].getBackground().equals(hit)) {
-					//Update board to show ship on fire
-					board[shot[0]][shot[1]].setBackground(hit);
-					//Save to the log
-					battlelog.writeToFile("Friendly ship hit, sir! at row " + shot[0] + " column " + shot[1] + " at t + "+ registeredShot + " secs" );
-					//Update result array
-					result[2] = 1;
-				}
-				//If ship section was already hit
-				if(!board[shot[0]][shot[1]].getBackground().equals(hit)){
-					board[shot[0]][shot[1]].setBackground(missed);
-					//Track whether a ship in the fleet has been hit
-					dmg = dmg & false;
-					result[2] = 0;
+		//If water or miss
+		if(board[shot[0]][shot[1]].getBackground().equals(water) || board[shot[0]][shot[1]].getBackground().equals(missed)) { 
+			board[shot[0]][shot[1]].setBackground(missed);
+			//Track whether a ship in the fleet has been hit
+			dmg = dmg & false;
+			result[2] = 0;
+		} else   {
+			//Test whether it hit at every ships single grid coordinate
+			for (int i = 0; i < ships.length; i++) {
+				for (int j = 0; j < ssize[i]*2 - 1; j+=2) {
+					//Tests if the shot is on a ship target and if colour is still ship
+					if(shot[0] == ships[i][j] && shot[1] == ships[i][j+1]) {
+						if(board[ships[i][j]][ships[i][j+1]].getBackground().equals(ship)){
+						//Update board to show ship on fire
+						board[shot[0]][shot[1]].setBackground(hit);
+						//Save to the log
+						battlelog.writeToFile("Friendly ship hit, sir! at row " + shot[0] + " column " + shot[1] + " at t + "+ registeredShot + " secs" );
+						//Update result array
+						result[2] = 1;
+						//If ship section was already hit
+						} else {
+							//Track whether a ship in the fleet has been hit
+							dmg = dmg & false;
+							result[2] = 0;
+						}
+					}
 				}
 			}
 		}
@@ -509,7 +518,7 @@ public class gameClass extends JFrame {
 			battlelog.writeToFile("The enemy missed, sir! Hooray! Splash spotted at row " + shot[0] + " column " + shot[1] + " at t + "+ registeredShot + " secs" );
 		}
 		//Check to see if any of the ships were sunk
-		for (int i = 0; i < ships.length; i++) {
+		for (int i = 0; i < ships.length && fleetSunk; i++) {
 			sunk = true;
 			//For every pair of coordinate
 			for (int j = 0; j < ssize[i]*2 - 1; j+=2) {
@@ -533,7 +542,9 @@ public class gameClass extends JFrame {
 			battlelog.writeToFile("We lost our entire fleet, sir! The Admiral will surely be disappointed...");
 			result[3] = 1;
 		}
+		fleetSunk = true;
 		return result;
+		
 
 	}
 }

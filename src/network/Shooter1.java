@@ -5,60 +5,49 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Scanner;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 
-import gui.plyrBoard;
+
 /**
+ * 1st Shooter Client Class with individual input and output streams 
+ * from 2nd Shooter Client Class. Class requests shot results from server
+ * and updates the player's own board while sending back a "hit or miss"
+ * message back to the server.
  * 
  * @author desmondwong
  *
  */
-public class ShootingClient_Final {
+public class Shooter1 implements Runnable{
 	private static ObjectOutputStream output; //Data to be sent by Client
 	private static ObjectInputStream input; //Data received by Client
-	private String message; //global variable for string data
-	private  String Server; // server 1 name
+	private String Server; //server name
 	private static Socket clientSocket; //client socket
-	private int port;
-	
-	
-	public static class SocketThreads implements Runnable{
-		private String IP;
-		private int port;
-		public SocketThreads(String IPadd, int portnum){
-			IP = IPadd;
-			port = portnum;
-		}
-	
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			ShootingClient_Final shoot = new ShootingClient_Final(IP, port);
-			shoot.runShootingClient_Final();
-		}
-	}
+	private int port;//server port number
+	private static int index;
+
 	
 	/**
-	 * Constructor that takes the port number of user input
-	 * @param port
-	 * @param host
+	 * Constructor that stores server address and port number
+	 * @param IP server address
+	 * @param portnum server port number
 	 */
-	public ShootingClient_Final(String IP, int portnum){
+	public Shooter1(String IP, int portnum, int rindex){
 		Server = IP;
 		port = portnum;
+		index = rindex;
 	}
 	
 	/**
 	 * starts Client application
 	 */
-	public void runShootingClient_Final() {
+	public void run() {
 		try {
 			connectToServer(); //attempts to connect to server
+			//while (network.Network_Main.connected[0] != true || network.Network_Main.connected[1] != true){}
 			getStreams(); //receives input & output streams
-			processConnection(); //processes Data		
-
+			processConnection(); //processes Data	
 		}catch(EOFException eofException) {
 			System.out.println("\nClient terminating connection");//tells user that connection will terminate
 		}catch (IOException ioException) {
@@ -77,44 +66,48 @@ public class ShootingClient_Final {
 		System.out.println(("Attempting to connect to: " + Server + " at port " + port));
 		clientSocket = new Socket (InetAddress.getByName(Server), port);//new socket created based on server name and port number
 		System.out.println("Connected to: " + clientSocket.getInetAddress().getHostName());
+		network.Network_Main.connected[index] = true;
 	}
 	
 	/**
-	 * Gets streams to send and receive data
+	 * Stores streams to send and receive data in
+	 * class variables
 	 * @throws IOException
 	 */
 	private void getStreams() throws IOException{
 		output = new ObjectOutputStream(clientSocket.getOutputStream());//overwrites output stream with new Data
 		output.flush();//sends output stream
 		input = new ObjectInputStream(clientSocket.getInputStream());//overwrites input stream with new Data
-		//METHOD TO PROCESS INPUT
-		System.out.println("\nGot I/O streams\n");
+		System.out.println("\nGot I/O streams from Server: " + clientSocket.getInetAddress().getHostName() );
 	}
 	
 	/**
-	 * Processes connection with server
+	 * Interprets data from streams and updates the player's own board
+	 * then sends and outgoing message to server indicating hit or miss
 	 * @throws IOException
 	 */
 	private void processConnection() throws IOException{
-		//Scanner scan = new Scanner (System.in);//Scanner to take in user input
-		int []recmessage = new int [4];
+
+		//Displays own game board
+		network.Network_Main.Main_Thread.game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		network.Network_Main.Main_Thread.game.setSize(600, 425);
+		network.Network_Main.Main_Thread.game.setVisible(true);
+		
+		int [] recmessage = new int [4];
 		do{
 			try{
-				//message = (String) input.readObject();//the last string received by server
-				System.out.println("<SERVER><P" + port + "> " + message);
-				//recmessage = (int []) ;
-				System.out.println(input.readObject().toString());
-				//recmessage = Network_Main.Main_Thread.game.shotRec(recmessage); //RENAME
-				//String outgoing = scan.nextLine();//scans user input and puts it into outgoing string variable
- 
-				sendData(recmessage);//sends outgoing string variable to Server
-
+				System.out.println("<" + Server + port + "> fired a shot on you");
+				recmessage = (int []) input.readObject();
+				recmessage = Network_Main.Main_Thread.game.shotRec(recmessage); //RENAME
+				sendData(recmessage);//sends outgoing int[] variable to Server
+				//getStreams();
 			}catch(ClassNotFoundException classNotFoundException){
 				System.out.println("\nUnknown object type received\n"); //exception if object type received is unknown 
 			}
-		}while (recmessage[3] != 1);//does above while client message are not exit commands
-		Network_Main.thread[1].interrupt();
-		Network_Main.thread[2].interrupt();
+		}while (recmessage[3] != 1);//does above while own board is not dead
+		Network_Main.thread[1].interrupt();//thread 1 of this player's game is halted because player is dead
+		Network_Main.thread[2].interrupt();//thread 2 of this player's game is halted because player is dead
+		network.Network_Main.Main_Thread.game.setTitle("You Died");
 	}
 	
 	/**
@@ -132,29 +125,14 @@ public class ShootingClient_Final {
 	}
 	
 	/**
-	 * Sends data to server
-	 * @param message
-	 */
-	private void sendData(String message){
-		try{
-			output.writeObject(message);//overwrites output stream with message
-			output.flush();//sends output stream
-			output.reset();
-			System.out.println("\n<CLIENT> " + message); //shows on Client side what server sent to Server
-		}catch(IOException ioException){//handles error if found
-			System.out.println("\nError writing object\n");
-		}
-	}
-
-	/**
-	 * Sends message to client
+	 * method to send message to client
 	 * @param message
 	 */
 	private void sendData(int[] message){
 		try{
 			output.writeObject(message); //overwrites output stream with message
 			output.flush();//sends output stream
-			System.out.println("<SERVER><P" + port+ ">"  + message); //shows on Server side what server sent to Client
+			System.out.println("<G332-08> to <" + Server + port + "> " + Arrays.toString(message)); //shows on Server side what server sent to Client
 		}catch(IOException ioException){//handles error if found
 			System.out.println("\nError writing object");
 		}

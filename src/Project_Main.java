@@ -4,21 +4,20 @@ import network.Network_Main.Main_Thread;
 import java.io.IOException;
 import java.util.Scanner;
 
-import gui.GUI_Main;
-
-
+/**
+ * This program creates a three way battleship game
+ * that only requires the users to type in the 
+ * host addresseses and click launch before it launches the game
+ * and runs it. The winner is determined by the last man standing.
+ * @author Gilbert, Jain, Wong
+ *
+ */
 public class Project_Main {
-	public static String IP1;
-	public static String IP2;
-	public static int Port1;
-	public static int Port2;
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
 
-//		GUI_Main skrt = new GUI_Main();
-//		skrt.main(args);
     	Network_Main start = new Network_Main();
-		start.main(args);
+		start.main(args);//runs the main of Network_Main
 		
 
 	}
